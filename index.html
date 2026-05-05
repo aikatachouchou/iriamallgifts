@@ -571,7 +571,10 @@ function loadData(){
 // =================
 function init(){
   items = files.map(f=>{
-    let [name, point] = f.replace(".png","").split("_");
+    let name = f.replace(/\.[^/.]+$/, "").replace(/_\d+$/, "");
+    let pointMatch = f.match(/_(\d+)\./);
+    let point = pointMatch ? Number(pointMatch[1]) : 0;
+    
     return {
       file:f,
       name:name,
