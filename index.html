@@ -134,6 +134,11 @@ button:active{
     grid-template-columns: repeat(5, 72px);
   }
 }
+
+.tabs button.active{
+  background:var(--sub-pink);
+  color:white;
+}
 </style>
 </head>
 
@@ -156,10 +161,9 @@ button:active{
   <input id="search" placeholder="検索はひらがなで！" oninput="render()">
 
   <div class="tabs">
-    <button onclick="setFilter('all')">全体</button>
-    <button onclick="setFilter('small')">プチギフ</button>
-    <button onclick="setFilter('big')">デカギフ</button>
-  </div>
+     <button onclick="setFilter('all')" id="tab-all">全体</button>
+     <button onclick="setFilter('small')" id="tab-small">プチギフ</button>
+     <button onclick="setFilter('big')" id="tab-big">デカギフ</button>  </div>
 </div>
 
 <div class="table-container">
@@ -244,7 +248,6 @@ const files = [
   "きたこれ_5.jpg",
   "きゃんでぃー_5.jpg",
   "きゃーっ_5.jpg",
-  "きらきら_10.jpg",
   "きりおめ_5.jpg",
   "ぎゃくにね_5.jpg",
   "くうふく_5.jpg",
@@ -584,6 +587,8 @@ function init(){
 
   loadData();
   render();
+
+  document.getElementById("tab-"+filter).classList.add("active");
 }
 
 // =================
@@ -634,27 +639,30 @@ function render(){
 
     // 左クリック
     div.onclick=()=>{
-      saveUndo();
-      state[item.file]=(state[item.file]||0)+1;
-      render();
-    };
+   saveUndo();
+   state[item.file]=(state[item.file]||0)+1;
+
+  updateCell(div, item.file);
+  saveData();
+};
 
     // 右クリック（減算）
     div.oncontextmenu=(e)=>{
-      e.preventDefault();
-      if((state[item.file]||0)>0){
-        saveUndo();
-        state[item.file]--;
-        render();
-      }
-    };
+  e.preventDefault();
+  if((state[item.file]||0)>0){
+    saveUndo();
+    state[item.file]--;
+
+    updateCell(div, item.file);
+    saveData();
+  }
+};
 
     div.appendChild(img);
     div.appendChild(overlay);
     grid.appendChild(div);
   });
 
-  saveData();
 }
 
 // =================
@@ -693,12 +701,33 @@ function resetAll(){
 // フィルタ
 // =================
 function setFilter(f){
-  filter=f;
+  filter = f;
+
+  // 全部のボタンからactiveを消す
+  document.querySelectorAll(".tabs button").forEach(b=>{
+    b.classList.remove("active");
+  });
+
+  // 選んだボタンだけactive
+  document.getElementById("tab-"+f).classList.add("active");
+
   render();
 }
 
 // =================
 init();
+
+function updateCell(div, file){
+  let overlay = div.querySelector(".overlay");
+  let count = state[file] || 0;
+
+  if(count > 0){
+    overlay.innerText = count;
+    overlay.style.display = "flex";
+  }else{
+    overlay.style.display = "none";
+  }
+}
 </script>
 
 </body>
