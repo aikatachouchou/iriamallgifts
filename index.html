@@ -139,6 +139,28 @@ button:active{
   background:var(--sub-pink);
   color:white;
 }
+
+.overlay-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+
+.modal-box{
+  background:white;
+  padding:20px;
+  border-radius:20px;
+  border:4px solid var(--border);
+  text-align:center;
+}
+
+.modal-box button{
+  margin:5px;
+}
 </style>
 </head>
 
@@ -691,10 +713,7 @@ function redo(){
 // リセット
 // =================
 function resetAll(){
-  if(!confirm("全部リセットする？")) return;
-  saveUndo();
-  state={};
-  render();
+  openModal();
 }
 
 // =================
@@ -728,7 +747,30 @@ function updateCell(div, file){
     overlay.style.display = "none";
   }
 }
+
+function openModal(){
+  document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
+
+function confirmReset(){
+  saveUndo();
+  state={};
+  closeModal();
+  render();
+}
 </script>
+
+<div id="modal" class="overlay-modal">
+  <div class="modal-box">
+    <p>全部リセットする？</p>
+    <button onclick="closeModal()">キャンセル</button>
+    <button onclick="confirmReset()">リセット</button>
+  </div>
+</div>
 
 </body>
 </html>
