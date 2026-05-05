@@ -28,7 +28,6 @@ body{
 
 h1{
   color:var(--sub-pink);
-  margin:5px;
 }
 
 /* コントロール */
@@ -56,7 +55,7 @@ button:active{
   font-weight:bold;
 }
 
-/* 白いカード */
+/* 白カード */
 .table-container{
   background:var(--card);
   border-radius:20px;
@@ -98,7 +97,7 @@ button:active{
   object-fit:cover;
 }
 
-/* カウント表示 */
+/* カウント */
 .overlay{
   position:absolute;
   inset:0;
@@ -111,12 +110,7 @@ button:active{
   justify-content:center;
 }
 
-/* スマホ */
-@media(max-width:800px){
-  .grid{
-    grid-template-columns: repeat(5, 72px);
-  }
-}
+/* クレジット */
 .credit{
   margin-top:15px;
   font-size:14px;
@@ -132,6 +126,13 @@ button:active{
 
 .credit a:hover{
   text-decoration:underline;
+}
+
+/* スマホ */
+@media(max-width:800px){
+  .grid{
+    grid-template-columns: repeat(5, 72px);
+  }
 }
 </style>
 </head>
@@ -165,6 +166,12 @@ button:active{
   <div id="grid" class="grid"></div>
 </div>
 
+<div class="credit">
+  <a href="https://x.com/momochou_md?s=20" target="_blank">
+    for @momochou_md
+  </a>
+</div>
+
 <script>
 let items = [];
 let state = {};
@@ -172,14 +179,52 @@ let undoStack = [];
 let redoStack = [];
 let filter = "all";
 
+const STORAGE_KEY = "giftCounterData";
+
 // =================
-// ファイル一覧（ここを書くだけ）
+// ファイル一覧（ここを書く）
 // =================
 const files = [
-  // ここに追加
   // "いぬ_50.png",
   // "ねこ_120.png"
 ];
+
+// =================
+// 保存
+// =================
+function saveData(){
+  const data = {
+    state,
+    undoStack,
+    redoStack,
+    filter,
+    sort: document.getElementById("sort").value,
+    search: document.getElementById("search").value
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// =================
+// 読み込み
+// =================
+function loadData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+
+  try{
+    const data = JSON.parse(raw);
+    state = data.state || {};
+    undoStack = data.undoStack || [];
+    redoStack = data.redoStack || [];
+    filter = data.filter || "all";
+
+    if(data.sort) document.getElementById("sort").value = data.sort;
+    if(data.search) document.getElementById("search").value = data.search;
+
+  }catch(e){
+    console.error("データ読み込み失敗", e);
+  }
+}
 
 // =================
 // 初期化
@@ -193,6 +238,8 @@ function init(){
       point:Number(point)
     };
   });
+
+  loadData();
   render();
 }
 
@@ -242,12 +289,14 @@ function render(){
       overlay.style.display="none";
     }
 
+    // 左クリック
     div.onclick=()=>{
       saveUndo();
       state[item.file]=(state[item.file]||0)+1;
       render();
     };
 
+    // 右クリック（減算）
     div.oncontextmenu=(e)=>{
       e.preventDefault();
       if((state[item.file]||0)>0){
@@ -261,6 +310,8 @@ function render(){
     div.appendChild(overlay);
     grid.appendChild(div);
   });
+
+  saveData();
 }
 
 // =================
@@ -306,12 +357,6 @@ function setFilter(f){
 // =================
 init();
 </script>
-
-<div class="credit">
-  <a href="https://x.com/momochou_md?s=20" target="_blank">
-    for @momochou_md
-  </a>
-</div>
 
 </body>
 </html>
