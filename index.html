@@ -875,11 +875,10 @@ function closeBrowserModal(){
 }
 
 function openExternalBrowser(){
-  // 外部ブラウザで開く試み
   const url = location.href;
 
-  // iOS / Android 両対応の簡易版
-  window.location.href = url;
+  // 新しいタブで開く（外部ブラウザに飛ぶ可能性あり）
+  window.open(url, "_blank");
 }
 </script>
 
