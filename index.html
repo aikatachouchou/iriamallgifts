@@ -874,12 +874,6 @@ function closeBrowserModal(){
   document.getElementById("browserModal").style.display = "none";
 }
 
-function openExternalBrowser(){
-  const url = location.href;
-
-  // 新しいタブで開く（外部ブラウザに飛ぶ可能性あり）
-  window.open(url, "_blank");
-}
 </script>
 
 <div id="modal" class="overlay-modal">
@@ -892,9 +886,11 @@ function openExternalBrowser(){
 
 <div id="browserModal" class="overlay-modal">
   <div class="modal-box">
-    <p>しんちょく機能は<br>ブラウザーでしか使えないよ！</p>
-    <button onclick="closeBrowserModal()">大丈夫！</button>
-    <button onclick="openExternalBrowser()">ひらく！</button>
+    <p>
+      ブラウザーでひらいてね！<br>
+      （Chrome・Safariなど）
+    </p>
+    <button onclick="closeBrowserModal()">わかった！</button>
   </div>
 </div>
 
