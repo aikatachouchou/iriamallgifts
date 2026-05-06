@@ -161,6 +161,12 @@ button:active{
 .modal-box button{
   margin:5px;
 }
+
+.progress-btn{
+  border-radius:999px; /* 完全な丸 */
+  padding:8px 16px;
+  font-weight:bold;
+}
 </style>
 </head>
 
@@ -168,10 +174,15 @@ button:active{
 
 <h1>全ギフたいきゅう！</h1>
 
+
+
 <div class="controls">
+   
   <button onclick="undo()">もどす</button>
   <button onclick="redo()">すすむ</button>
   <button onclick="resetAll()">りせっと</button>
+  <button class="progress-btn" onclick="shareProgress()">しんちょく</button>
+
 
   <br>
 
@@ -186,6 +197,8 @@ button:active{
      <button onclick="setFilter('all')" id="tab-all">全体</button>
      <button onclick="setFilter('small')" id="tab-small">プチギフ</button>
      <button onclick="setFilter('big')" id="tab-big">デカギフ</button>  </div>
+
+
 </div>
 
 <div class="table-container">
@@ -761,6 +774,72 @@ function confirmReset(){
   state={};
   closeModal();
   render();
+}
+
+function generateProgressImage(){
+  const cols = 20;
+  const size = 40;
+  const padding = 10;
+
+  const list = items.filter(item => (state[item.file] || 0) > 0);
+  const rows = Math.ceil(list.length / cols);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = cols * size + padding * 2;
+  canvas.height = rows * size + padding * 2;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  let loaded = 0;
+
+  return new Promise(resolve=>{
+    if(list.length === 0){
+      resolve(canvas.toDataURL("image/png"));
+      return;
+    }
+
+    list.forEach((item, index)=>{
+      const count = state[item.file] || 0;
+
+      const x = index % cols;
+      const y = Math.floor(index / cols);
+
+      const img = new Image();
+      img.src = "gifts/" + item.file;
+
+      img.onload = ()=>{
+        ctx.drawImage(img, padding + x*size, padding + y*size, size, size);
+
+        if(count > 0){
+          ctx.fillStyle = "black";
+          ctx.font = "bold 12px sans-serif";
+          ctx.fillText(count, padding + x*size + 2, padding + y*size + 12);
+        }
+
+        loaded++;
+        if(loaded === list.length){
+          resolve(canvas.toDataURL("image/png"));
+        }
+      };
+    });
+  });
+}
+
+async function shareProgress(){
+  const dataUrl = await generateProgressImage();
+
+  // 画像ダウンロード
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = "progress.png";
+  a.click();
+
+  // 投稿画面を開く
+  const text = encodeURIComponent("しんちょく！");
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
 }
 </script>
 
