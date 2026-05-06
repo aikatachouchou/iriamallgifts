@@ -781,7 +781,7 @@ function generateProgressImage(){
   const size = 40;
   const padding = 10;
 
-  const list = items.filter(item => (state[item.file] || 0) > 0);
+  const list = items;
   const rows = Math.ceil(list.length / cols);
 
   const canvas = document.createElement("canvas");
