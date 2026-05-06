@@ -624,6 +624,10 @@ function init(){
   render();
 
   document.getElementById("tab-"+filter).classList.add("active");
+
+if(isInAppBrowser()){
+  setTimeout(openBrowserModal, 500);
+}
 }
 
 // =================
@@ -813,7 +817,7 @@ function generateProgressImage(){
       img.onload = ()=>{
         ctx.drawImage(img, padding + x*size, padding + y*size, size, size);
 
-      if(count > 0){
+ if(count > 0){
   const drawX = padding + x*size;
   const drawY = padding + y*size;
 
@@ -833,7 +837,7 @@ function generateProgressImage(){
     drawY + size/2
   );
 }
-        
+
         loaded++;
         if(loaded === list.length){
           resolve(canvas.toDataURL("image/png"));
@@ -856,6 +860,27 @@ async function shareProgress(){
   const text = encodeURIComponent("しんちょく！");
   window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
 }
+
+function isInAppBrowser(){
+  const ua = navigator.userAgent || "";
+  return /Twitter/.test(ua); // Xアプリ内ブラウザ検知
+}
+
+function openBrowserModal(){
+  document.getElementById("browserModal").style.display = "flex";
+}
+
+function closeBrowserModal(){
+  document.getElementById("browserModal").style.display = "none";
+}
+
+function openExternalBrowser(){
+  // 外部ブラウザで開く試み
+  const url = location.href;
+
+  // iOS / Android 両対応の簡易版
+  window.location.href = url;
+}
 </script>
 
 <div id="modal" class="overlay-modal">
@@ -863,6 +888,14 @@ async function shareProgress(){
     <p>全部リセットする？</p>
     <button onclick="closeModal()">キャンセル</button>
     <button onclick="confirmReset()">リセット</button>
+  </div>
+</div>
+
+<div id="browserModal" class="overlay-modal">
+  <div class="modal-box">
+    <p>しんちょく機能は<br>ブラウザーでしか使えないよ！</p>
+    <button onclick="closeBrowserModal()">大丈夫！</button>
+    <button onclick="openExternalBrowser()">ひらく！</button>
   </div>
 </div>
 
