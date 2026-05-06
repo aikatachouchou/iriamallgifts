@@ -813,12 +813,27 @@ function generateProgressImage(){
       img.onload = ()=>{
         ctx.drawImage(img, padding + x*size, padding + y*size, size, size);
 
-        if(count > 0){
-          ctx.fillStyle = "black";
-          ctx.font = "bold 12px sans-serif";
-          ctx.fillText(count, padding + x*size + 2, padding + y*size + 12);
-        }
+      if(count > 0){
+  const drawX = padding + x*size;
+  const drawY = padding + y*size;
 
+  // ① 半透明の黒で暗くする
+  ctx.fillStyle = "rgba(0,0,0,0.55)";
+  ctx.fillRect(drawX, drawY, size, size);
+
+  // ② 中央に大きい数字
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 16px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillText(
+    count,
+    drawX + size/2,
+    drawY + size/2
+  );
+}
+        
         loaded++;
         if(loaded === list.length){
           resolve(canvas.toDataURL("image/png"));
