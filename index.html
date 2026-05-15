@@ -970,6 +970,26 @@ if(loaded === list.length){
   resolve(canvas.toDataURL("image/png"));
 }
       };
+img.onerror = ()=>{
+
+  loaded++;
+
+  if(loaded === list.length){
+
+    ctx.fillStyle = "#ff6fa5";
+    ctx.font = "bold 24px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(
+      `周回数：${loopCount}`,
+      canvas.width / 2,
+      canvas.height - footerHeight / 2
+    );
+
+    resolve(canvas.toDataURL("image/png"));
+  }
+};
     });
   });
 }
