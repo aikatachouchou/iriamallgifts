@@ -849,9 +849,19 @@ function generateProgressImage(){
   const list = items;
   const rows = Math.ceil(list.length / cols);
 
-  const canvas = document.createElement("canvas");
-  canvas.width = cols * size + padding * 2;
-  canvas.height = rows * size + padding * 2;
+
+/* =====================
+   周回数を計算
+===================== */
+const counts = list.map(item => state[item.file] || 0);
+const loopCount = counts.length ? Math.min(...counts) : 0;
+
+/* 下に文字を描く余白 */
+const footerHeight = 50;
+
+const canvas = document.createElement("canvas");
+canvas.width = cols * size + padding * 2;
+canvas.height = rows * size + padding * 2 + footerHeight;
 
   const ctx = canvas.getContext("2d");
 
@@ -899,10 +909,28 @@ function generateProgressImage(){
   );
 }
 
-        loaded++;
-        if(loaded === list.length){
-          resolve(canvas.toDataURL("image/png"));
-        }
+loaded++;
+
+
+if(loaded === list.length){
+
+  /* =====================
+     周回数テキスト
+  ===================== */
+
+  ctx.fillStyle = "#ff6fa5";
+  ctx.font = "bold 24px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillText(
+    `周回数：${loopCount}`,
+    canvas.width / 2,
+    canvas.height - footerHeight / 2
+  );
+
+  resolve(canvas.toDataURL("image/png"));
+}
       };
     });
   });
