@@ -258,6 +258,9 @@ input{
      <button onclick="setFilter('all')" id="tab-all">全体</button>
      <button onclick="setFilter('small')" id="tab-small">プチギフ</button>
      <button onclick="setFilter('big')" id="tab-big">デカギフ</button>  </div>
+   <button onclick="setFilter('filled')" id="tab-filled">うまってる</button>
+   <button onclick="setFilter('empty')" id="tab-empty">うまってない</button>
+
 
 
 </div>
@@ -716,11 +719,26 @@ function render(){
   }
 
   // フィルタ
-  list=list.filter(i=>{
-    if(filter==="small") return i.point<=99;
-    if(filter==="big") return i.point>=100;
-    return true;
-  });
+list=list.filter(i=>{
+
+  if(filter==="small"){
+    return i.point<=99;
+  }
+
+  if(filter==="big"){
+    return i.point>=100;
+  }
+
+  if(filter==="filled"){
+    return (state[i.file] || 0) >= 1;
+  }
+
+  if(filter==="empty"){
+    return (state[i.file] || 0) === 0;
+  }
+
+  return true;
+});
 
   // 検索
   const kw=document.getElementById("search").value;
@@ -854,9 +872,20 @@ function generateProgressImage(){
   const size = 40;
   const padding = 10;
 
-  const list = items;
-  const rows = Math.ceil(list.length / cols);
+  const list = [...items].sort((a,b)=>{
 
+    const countA = state[a.file] || 0;
+    const countB = state[b.file] || 0;
+
+    /* 0は最後へ */
+    if(countA === 0 && countB > 0) return 1;
+    if(countB === 0 && countA > 0) return -1;
+
+    /* カウント降順 */
+    return countB - countA;
+  });
+
+  const rows = Math.ceil(list.length / cols);
 
 /* =====================
    周回数を計算
