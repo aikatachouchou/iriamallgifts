@@ -242,7 +242,7 @@ input{
   <button onclick="undo()">もどす</button>
   <button onclick="redo()">すすむ</button>
   <button onclick="resetAll()">りせっと</button>
-  <button class="progress-btn" onclick="shareProgress()">しんちょく</button>
+  <button class="progress-btn" onclick="openProgressModal()">しんちょく</button>
 
 
   <br>
@@ -885,23 +885,31 @@ function confirmReset(){
   render();
 }
 
-function generateProgressImage(){
+function generateProgressImage(mode="sorted"){
   const cols = 20;
   const size = 40;
   const padding = 10;
 
-  const list = [...items].sort((a,b)=>{
+let list;
+
+if(mode === "sorted"){
+
+  list = [...items].sort((a,b)=>{
 
     const countA = state[a.file] || 0;
     const countB = state[b.file] || 0;
 
-    /* 0は最後へ */
     if(countA === 0 && countB > 0) return 1;
     if(countB === 0 && countA > 0) return -1;
 
-    /* カウント降順 */
     return countB - countA;
   });
+
+}else{
+
+  list = [...items];
+
+}
 
   const rows = Math.ceil(list.length / cols);
 
@@ -1011,18 +1019,49 @@ img.onerror = ()=>{
   });
 }
 
-async function shareProgress(){
-  const dataUrl = await generateProgressImage();
+function openProgressModal(){
+  document.getElementById("progressModal").style.display = "flex";
+}
 
-  // 画像ダウンロード
-  const a = document.createElement("a");
-  a.href = dataUrl;
-  a.download = "progress.png";
-  a.click();
+function closeProgressModal(){
+  document.getElementById("progressModal").style.display = "none";
+}
 
-  // 投稿画面を開く
-  const text = encodeURIComponent("しんちょく！");
-  window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
+async function createProgressImage(mode){
+
+  closeProgressModal();
+
+  const dataUrl = await generateProgressImage(mode);
+
+  const w = window.open();
+
+  w.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>進捗画像</title>
+      <style>
+        body{
+          margin:0;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          min-height:100vh;
+          background:#fff0f6;
+        }
+
+        img{
+          max-width:95%;
+          height:auto;
+        }
+      </style>
+    </head>
+    <body>
+      <img src="${dataUrl}">
+    </body>
+    </html>
+  `);
+
 }
 
 function isInAppBrowser(){
@@ -1058,5 +1097,26 @@ function closeBrowserModal(){
   </div>
 </div>
 
+<div id="progressModal" class="overlay-modal">
+  <div class="modal-box">
+
+    <p>画像の並び方を選んでね！</p>
+
+    <button onclick="createProgressImage('sorted')">
+      埋まってるギフトを前に並べる
+    </button>
+
+    <button onclick="createProgressImage('normal')">
+      並び替えない
+    </button>
+
+    <br><br>
+
+    <button onclick="closeProgressModal()">
+      キャンセル
+    </button>
+
+  </div>
+</div>
 </body>
 </html>
