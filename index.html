@@ -1031,37 +1031,36 @@ async function createProgressImage(mode){
 
   closeProgressModal();
 
-  const dataUrl = await generateProgressImage(mode);
+  // 先にタブを開く
+  const newTab = window.open("", "_blank");
 
-  const w = window.open();
+  if(!newTab){
+    alert("新しいタブを開けませんでした");
+    return;
+  }
 
-  w.document.write(`
-    <!DOCTYPE html>
+  newTab.document.write(`
     <html>
-    <head>
-      <title>進捗画像</title>
-      <style>
-        body{
-          margin:0;
-          display:flex;
-          justify-content:center;
-          align-items:center;
-          min-height:100vh;
-          background:#fff0f6;
-        }
-
-        img{
-          max-width:95%;
-          height:auto;
-        }
-      </style>
-    </head>
-    <body>
-      <img src="${dataUrl}">
+    <body style="
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      font-family:sans-serif;
+    ">
+      画像を生成中...
     </body>
     </html>
   `);
 
+  const dataUrl = await generateProgressImage(mode);
+
+  newTab.document.body.innerHTML = `
+    <img
+      src="${dataUrl}"
+      style="max-width:100%;height:auto;"
+    >
+  `;
 }
 
 function isInAppBrowser(){
