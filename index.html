@@ -238,7 +238,6 @@ input{
 
 
 <div class="controls">
-   <button onclick="fillSmallGifts()">プチギフうめ</button>
   <button onclick="undo()">もどす</button>
   <button onclick="redo()">すすむ</button>
   <button onclick="resetAll()">りせっと</button>
@@ -253,6 +252,7 @@ input{
   </select>
 
   <input id="search" placeholder="検索はひらがなで！" oninput="render()">
+<button onclick="openFillModal()">プチギフ埋め</button>
 
   <div class="tabs">
      <button onclick="setFilter('all')" id="tab-all">全体</button>
@@ -271,8 +271,8 @@ input{
 </div>
 
 <div class="credit">
-  <a href="https://x.com/momochou_md?s=20" target="_blank">
-    for @momochou_md
+  <a href="https://x.com/hoshiyozora_md?s=20" target="_blank">
+    for @hoshiyozora_md
   </a>
 </div>
 
@@ -851,24 +851,27 @@ function resetAll(){
   openModal();
 }
 // =================
-// プチギフ一括カウントアップ
+// プチギフ一括埋めモーダル・処理
 // =================
-function fillSmallGifts(){
-  // もどす（Undo）用に現在の状態を保存
-  saveUndo();
+function openFillModal(){
+  document.getElementById("fillModal").style.display = "flex";
+}
 
-  // ポイント99以下のアイテムのカウントをすべて+1する
+function closeFillModal(){
+  document.getElementById("fillModal").style.display = "none";
+}
+
+function confirmFillGifts(){
+  saveUndo();
   items.forEach(item => {
     if(item.point <= 99){
       state[item.file] = (state[item.file] || 0) + 1;
     }
   });
-
-  // 画面の再描画とデータの保存
+  closeFillModal();
   render();
   saveData();
 }
-
 // =================
 // フィルタ
 // =================
@@ -1114,6 +1117,14 @@ function closeBrowserModal(){
     <p>全部リセットする？</p>
     <button onclick="closeModal()">キャンセル</button>
     <button onclick="confirmReset()">リセット</button>
+  </div>
+</div>
+
+<div id="fillModal" class="overlay-modal">
+  <div class="modal-box">
+    <p>プチギフをぜんぶうめる？</p>
+    <button onclick="closeFillModal()">キャンセル</button>
+    <button onclick="confirmFillGifts()">うめる！</button>
   </div>
 </div>
 
