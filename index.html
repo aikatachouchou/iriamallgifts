@@ -847,6 +847,9 @@ function redo(){
 // リセット
 // =================
 function resetAll(){
+
+  openModal();
+}
 // =================
 // プチギフ一括カウントアップ
 // =================
@@ -864,8 +867,6 @@ function fillSmallGifts(){
   // 画面の再描画とデータの保存
   render();
   saveData();
-}
-  openModal();
 }
 
 // =================
